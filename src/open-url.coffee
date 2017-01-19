@@ -32,7 +32,7 @@ module.exports = (robot) ->
 			.patch(JSON.stringify({ bookmarks: bookmarks })) (err, res, body) ->
 				callback (not err?) and res.statusCode is 200
 
-	robot.respond /open (\S*)$/i, (context) ->
+	robot.respond /open (\S+)$/i, (context) ->
 		open context.match[1], (done) ->
 			context.send if done then 'Done.' else 'Oops! (a)'
 
@@ -40,10 +40,10 @@ module.exports = (robot) ->
 		open context.envelope.room, (done) ->
 			context.send if done then 'Done.' else 'Oops! (b)'
 
-	robot.respond /bookmark (\S*) (\S*)$/i, (context) ->
+	robot.respond /bookmark (\S+) (\S+)$/i, (context) ->
 		bookmark context.match[2], context.match[1], (done) ->
 			context.send if done then 'Done.' else 'Oops! (c)'
 
-	robot.respond /bookmark (\S*)$/i, (context) ->
+	robot.respond /bookmark (\S+)$/i, (context) ->
 		bookmark context.envelope.room, context.match[1], (done) ->
 			context.send if done then 'Done.' else 'Oops! (d)'
