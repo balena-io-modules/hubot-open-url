@@ -35,6 +35,8 @@ module.exports = (robot) ->
 		if bookmarks[key]?
 			robot.http(bookmarks[key]).get() (err, res, body) ->
 				callback (not err?) and res.statusCode is 200
+		else
+			callback false
 
 	bookmark = (key, value, callback) ->
 		bookmarks[key] = value
