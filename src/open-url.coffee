@@ -2,7 +2,7 @@
 #   Open a url
 #
 # Commands:
-#   hubot open - Open the bookmark named after the thread
+#   hubot open - Open the bookmark named after the room
 #   hubot open named - Open the bookmark named
 #
 # Author:
@@ -12,6 +12,9 @@ firebaseUrl = process.env.HUBOT_FIREBASE_URL
 firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
+confirmations = [
+	'Done.'
+]
 
 module.exports = (robot) ->
 	robot.http("#{firebaseUrl}/data/bookmarks.json?auth=#{firebaseAuth}")
@@ -34,11 +37,11 @@ module.exports = (robot) ->
 
 	robot.respond /open (\S+)( office| sesame)?$/i, (context) ->
 		open context.match[1], (done) ->
-			context.send if done then 'Done.' else 'Oops! (a)'
+			context.send if done then context.random confirmations else "Couldn't find " + context.match[1] + ' key.'
 
 	robot.respond /open( office| sesame)?$/i, (context) ->
 		open context.envelope.room, (done) ->
-			context.send if done then 'Done.' else 'Oops! (b)'
+			context.send if done then context.random confirmations else "Couldn't find " + context.envelope.room + ' key.'
 
 	robot.respond /bookmark (\S+) (\S+)$/i, (context) ->
 		bookmark context.match[2], context.match[1], (done) ->
