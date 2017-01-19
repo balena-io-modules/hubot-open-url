@@ -13,7 +13,14 @@ firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
 confirmations = [
-	'Done.'
+	'Hey man, nice to see you'
+	'Howdy!'
+	"G'day mate!"
+	'Hiya!'
+	'What’s up man'
+	'Sup bro?'
+	'Yeah man, on it'
+	'Oh, wow, love those shoes!'
 ]
 
 module.exports = (robot) ->
