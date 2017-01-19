@@ -1,14 +1,14 @@
 {
-  "name": "hubot-base-script",
+  "name": "hubot-open-url",
   "version": "0.0.1",
-  "description": "A simple hubot script that does nothing, to start development from",
+  "description": "A simple hubot script that opens a url",
   "main": "loader.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/resin-io-modules/hubot-base-script.git"
+    "url": "https://github.com/resin-io-modules/hubot-open-url.git"
   },
   "keywords": [
     "hubot",
@@ -17,9 +17,9 @@
   "author": "Andrew Lucas (andrewl@resin.io)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/resin-io-modules/hubot-base-script/issues"
+    "url": "https://github.com/resin-io-modules/hubot-open-url/issues"
   },
-  "homepage": "https://github.com/resin-io-modules/hubot-base-script#readme",
+  "homepage": "https://github.com/resin-io-modules/hubot-open-url#readme",
   "dependencies": {
     "coffee-script": "^1.12.2"
   },
