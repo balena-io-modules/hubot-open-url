@@ -32,11 +32,11 @@ module.exports = (robot) ->
 			.patch(JSON.stringify({ bookmarks: bookmarks })) (err, res, body) ->
 				callback (not err?) and res.statusCode is 200
 
-	robot.respond /open (\S+)$/i, (context) ->
+	robot.respond /open (\S+)( office| sesame)?$/i, (context) ->
 		open context.match[1], (done) ->
 			context.send if done then 'Done.' else 'Oops! (a)'
 
-	robot.respond /open$/i, (context) ->
+	robot.respond /open( office| sesame)?$/i, (context) ->
 		open context.envelope.room, (done) ->
 			context.send if done then 'Done.' else 'Oops! (b)'
 
