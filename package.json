@@ -1,5 +1,5 @@
 {
-  "name": "hubot-open-url",
+  "name": "hubot-open-url-@resin",
   "version": "0.2.0",
   "description": "A simple hubot script that opens a url",
   "main": "loader.coffee",
