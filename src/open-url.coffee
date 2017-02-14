@@ -15,14 +15,26 @@ firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
 confirmations = [
-	'Hey man, nice to see you'
+	'Door unlocked.'
+	"You're on the list."
+	'Come on in.'
+	'psssh...tsch'
+	"What can I say, except 'you're welcome'!"
+]
+salutations = [
+	'Hey there!'
 	'Howdy!'
 	"G'day mate!"
 	'Hiya!'
-	'What’s up man'
+	'Hi!'
+	'Hello!'
+]
+greetings = [
+	'Nice to see you!'
+	'What’s up man?'
 	'Sup bro?'
-	'Yeah man, on it'
-	'Oh, wow, love those shoes!'
+	'Loving those shoes!'
+	'Grab a coffee.'
 ]
 
 module.exports = (robot) ->
@@ -87,7 +99,11 @@ module.exports = (robot) ->
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
 		try
 			open(getValueFromContext(context))
-			.then(-> context.send(context.random(confirmations)))
+			.then(-> context.send(
+				context.random(salutations) + ' ' +
+				context.random(greetings) + ' ' +
+				context.random(confirmations)
+			))
 			.catch((error) -> context.send(error.message))
 		catch error
 			context.send(error.message)
