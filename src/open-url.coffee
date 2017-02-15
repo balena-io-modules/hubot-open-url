@@ -36,6 +36,11 @@ greetings = [
 	'Loving those shoes!'
 	'Grab a coffee.'
 ]
+holdings = [
+	'Working on it.'
+	'Doing that now.'
+	'Gimme a moment.'
+]
 
 module.exports = (robot) ->
 	robot.http("#{firebaseUrl}/data/bookmarks.json?auth=#{firebaseAuth}")
@@ -97,22 +102,16 @@ module.exports = (robot) ->
 	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
+		context.send(context.random(greetings) + ' ' + context.random(holdings))
 		try
 			open(getValueFromContext(context))
-			.then(->
-				response = [
-					context.random(salutations)
-					context.random(greetings)
-					context.random(confirmations)
-				]
-				context.send(response.join(' '))
-			)
+			.then(-> context.send(context.random(confirmations) + ' ' + context.random(salutations)))
 			.catch (error) ->
 				robot.logger.error(error)
-				context.send('Something went wrong')
+				context.send('Something went wrong. Debug output logged.')
 		catch error
 			robot.logger.error(error)
-			context.send('Something went wrong.')
+			context.send('Something went wrong. Debug output logged')
 
 	###*
 	* Bookmark a url for the given word
