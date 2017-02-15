@@ -102,10 +102,10 @@ module.exports = (robot) ->
 	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
-		context.send(context.random(greetings) + ' ' + context.random(holdings))
+		context.send(context.random(salutations) + ' ' + context.random(holdings))
 		try
 			open(getValueFromContext(context))
-			.then(-> context.send(context.random(confirmations) + ' ' + context.random(salutations)))
+			.then(-> context.send(context.random(confirmations) + ' ' + context.random(greetings)))
 			.catch (error) ->
 				robot.logger.error(error)
 				context.send('Something went wrong. Debug output logged.')
