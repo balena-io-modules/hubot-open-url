@@ -125,7 +125,7 @@ module.exports = (robot) ->
 	* Bookmark a url for this room
 	* bookmark, followed by whitespace, followed by non-whitespace (url), followed by end of string
 	###
-	robot.respond /bookmark\w(\S+)$/i, (context) ->
+	robot.respond /bookmark\s(\S+)$/i, (context) ->
 		bookmark(context.envelope.room, context.match[1])
 		.then(-> context.send('Done.'))
 		.catch((error) -> context.send(error.message))
