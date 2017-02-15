@@ -15,31 +15,10 @@ firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
 confirmations = [
-	'Door unlocked.'
-	"You're on the list."
-	'Come on in.'
-	'psssh...tsch'
-	"What can I say, except 'you're welcome'!"
-]
-salutations = [
-	'Hey there!'
-	'Howdy!'
-	"G'day mate!"
-	'Hiya!'
-	'Hi!'
-	'Hello!'
-]
-greetings = [
-	'Nice to see you!'
-	'What’s up man?'
-	'Sup bro?'
-	'Loving those shoes!'
-	'Grab a coffee.'
+	'Done.'
 ]
 holdings = [
-	'Working on it.'
-	'Doing that now.'
-	'Gimme a moment.'
+	'Doing'
 ]
 
 module.exports = (robot) ->
@@ -102,16 +81,16 @@ module.exports = (robot) ->
 	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
-		context.send(context.random(salutations) + ' ' + context.random(holdings))
+		context.send(context.random(holdings))
 		try
 			open(getValueFromContext(context))
-			.then(-> context.send(context.random(confirmations) + ' ' + context.random(greetings)))
+			.then(-> context.send(context.random(confirmations)))
 			.catch (error) ->
 				robot.logger.error(error)
 				context.send('Something went wrong. Debug output logged.')
 		catch error
 			robot.logger.error(error)
-			context.send('Something went wrong. Debug output logged')
+			context.send('Something went wrong. Debug output logged.')
 
 	###*
 	* Bookmark a url for the given word
