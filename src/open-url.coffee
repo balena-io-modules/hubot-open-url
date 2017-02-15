@@ -99,11 +99,14 @@ module.exports = (robot) ->
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
 		try
 			open(getValueFromContext(context))
-			.then(-> context.send(
-				context.random(salutations) + ' ' +
-				context.random(greetings) + ' ' +
-				context.random(confirmations)
-			))
+			.then(->
+				response = [
+					context.random(salutations)
+					context.random(greetings)
+					context.random(confirmations)
+				]
+				context.send(response.join(' '))
+			)
 			.catch((error) -> context.send(error.message))
 		catch error
 			context.send(error.message)
