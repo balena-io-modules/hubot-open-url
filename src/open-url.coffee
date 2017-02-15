@@ -37,7 +37,9 @@ greetings = [
 	'Grab a coffee.'
 ]
 holdings = [
-	'Doing'
+	'Working on it.'
+	'Doing that now.'
+	'Gimme a moment.'
 ]
 
 module.exports = (robot) ->
@@ -63,12 +65,12 @@ module.exports = (robot) ->
 
 	###*
 	* Attempt to visit the url referenced by key
-	* @param {string} key from the bookmarks object
+	* @param {string} url to visit
   * @return {Promise} Handle output from the asynchronous
 	###
-	open = (key) ->
+	open = (url) ->
 		new Promise (resolve, reject) ->
-			robot.http(bookmarks[key]).get() createResolver(resolve, reject)
+			robot.http(url).get() createResolver(resolve, reject)
 
 	###*
 	* Store a url in the cache and firebase
@@ -100,36 +102,32 @@ module.exports = (robot) ->
 	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
-		context.send(context.random(holdings))
+		context.send(context.random(greetings) + ' ' + context.random(holdings))
 		try
 			open(getValueFromContext(context))
-			.then(->
-				response = [
-					context.random(salutations)
-					context.random(greetings)
-					context.random(confirmations)
-				]
-				context.send(response.join(' '))
-			)
-			.catch((error) -> context.send(error.message))
+			.then(-> context.send(context.random(confirmations) + ' ' + context.random(salutations)))
+			.catch (error) ->
+				robot.logger.error(error)
+				context.send('Something went wrong. Debug output logged.')
 		catch error
-			context.send(error.message)
+			robot.logger.error(error)
+			context.send('Something went wrong. Debug output logged')
 
 	###*
 	* Bookmark a url for the given word
-	* bookmark, followed by non-word, followed by non-whitespace (url) ...
-	* followed by non-word, followed by word (key), followed by end of string
+	* bookmark, followed by whitespace, followed by non-whitespace (url) ...
+	* followed by whitespace, followed by word (key), followed by end of string
 	###
-	robot.respond /bookmark\W(\S+)\W(\w+)$/i, (context) ->
+	robot.respond /bookmark\s(\S+)\s(\w+)$/i, (context) ->
 		bookmark(context.match[2], context.match[1])
 		.then(-> context.send('Done.'))
 		.catch((error) -> context.send(error.message))
 
 	###*
 	* Bookmark a url for this room
-	* bookmark, followed by non-word, followed by non-whitespace (url), followed by end of string
+	* bookmark, followed by whitespace, followed by non-whitespace (url), followed by end of string
 	###
-	robot.respond /bookmark\W(\S+)$/i, (context) ->
+	robot.respond /bookmark\s(\S+)$/i, (context) ->
 		bookmark(context.envelope.room, context.match[1])
 		.then(-> context.send('Done.'))
 		.catch((error) -> context.send(error.message))
