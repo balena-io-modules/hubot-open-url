@@ -17,6 +17,9 @@ bookmarks = {}
 confirmations = [
 	'Done.'
 ]
+holdings = [
+	'Doing'
+]
 
 module.exports = (robot) ->
 	robot.http("#{firebaseUrl}/data/bookmarks.json?auth=#{firebaseAuth}")
@@ -78,6 +81,7 @@ module.exports = (robot) ->
 	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
+		context.send(context.random(holdings))
 		try
 			open(getValueFromContext(context))
 			.then(-> context.send(context.random(confirmations)))
