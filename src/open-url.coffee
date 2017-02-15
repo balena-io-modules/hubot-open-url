@@ -60,12 +60,12 @@ module.exports = (robot) ->
 
 	###*
 	* Attempt to visit the url referenced by key
-	* @param {string} key from the bookmarks object
+	* @param {string} url to visit
   * @return {Promise} Handle output from the asynchronous
 	###
-	open = (key) ->
+	open = (url) ->
 		new Promise (resolve, reject) ->
-			robot.http(bookmarks[key]).get() createResolver(resolve, reject)
+			robot.http(url).get() createResolver(resolve, reject)
 
 	###*
 	* Store a url in the cache and firebase
