@@ -113,19 +113,19 @@ module.exports = (robot) ->
 
 	###*
 	* Bookmark a url for the given word
-	* bookmark, followed by non-word, followed by non-whitespace (url) ...
-	* followed by non-word, followed by word (key), followed by end of string
+	* bookmark, followed by whitespace, followed by non-whitespace (url) ...
+	* followed by whitespace, followed by word (key), followed by end of string
 	###
-	robot.respond /bookmark\W(\S+)\W(\w+)$/i, (context) ->
+	robot.respond /bookmark\s(\S+)\s(\w+)$/i, (context) ->
 		bookmark(context.match[2], context.match[1])
 		.then(-> context.send('Done.'))
 		.catch((error) -> context.send(error.message))
 
 	###*
 	* Bookmark a url for this room
-	* bookmark, followed by non-word, followed by non-whitespace (url), followed by end of string
+	* bookmark, followed by whitespace, followed by non-whitespace (url), followed by end of string
 	###
-	robot.respond /bookmark\W(\S+)$/i, (context) ->
+	robot.respond /bookmark\w(\S+)$/i, (context) ->
 		bookmark(context.envelope.room, context.match[1])
 		.then(-> context.send('Done.'))
 		.catch((error) -> context.send(error.message))
