@@ -15,31 +15,10 @@ firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
 confirmations = [
-	'Door unlocked.'
-	"You're on the list."
-	'Come on in.'
-	'psssh...tsch'
-	"What can I say, except 'you're welcome'!"
-]
-salutations = [
-	'Hey there!'
-	'Howdy!'
-	"G'day mate!"
-	'Hiya!'
-	'Hi!'
-	'Hello!'
-]
-greetings = [
-	'Nice to see you!'
-	'What’s up man?'
-	'Sup bro?'
-	'Loving those shoes!'
-	'Grab a coffee.'
+	'Done.'
 ]
 holdings = [
-	'Working on it.'
-	'Doing that now.'
-	'Gimme a moment.'
+	'Doing'
 ]
 
 module.exports = (robot) ->
@@ -64,9 +43,19 @@ module.exports = (robot) ->
 				reject(err ? new Error("StatusCode: #{res.statusCode}"))
 
 	###*
+	* This creates a function to report errors
+	* @param {Object} Hubot msg object
+	* @return {function} Takes (Error) and reports it
+	###
+	createErrorReporter = (context) ->
+		(error) ->
+			robot.logger.error(error)
+			context.send('Something went wrong. Debug output logged')
+
+	###*
 	* Attempt to visit the url referenced by key
 	* @param {string} url to visit
-  * @return {Promise} Handle output from the asynchronous
+	* @return {Promise} Handle output from the asynchronous
 	###
 	open = (url) ->
 		new Promise (resolve, reject) ->
@@ -102,16 +91,13 @@ module.exports = (robot) ->
 	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
-		context.send(context.random(salutations) + ' ' + context.random(holdings))
+		context.send(context.random(holdings))
 		try
 			open(getValueFromContext(context))
-			.then(-> context.send(context.random(confirmations) + ' ' + context.random(greetings)))
-			.catch (error) ->
-				robot.logger.error(error)
-				context.send('Something went wrong. Debug output logged.')
+			.then(-> context.send(context.random(confirmations)))
+			.catch(createErrorReporter(context))
 		catch error
-			robot.logger.error(error)
-			context.send('Something went wrong. Debug output logged')
+			createErrorReporter(context)(error)
 
 	###*
 	* Bookmark a url for the given word
@@ -120,8 +106,8 @@ module.exports = (robot) ->
 	###
 	robot.respond /bookmark\s(\S+)\s(\w+)$/i, (context) ->
 		bookmark(context.match[2], context.match[1])
-		.then(-> context.send('Done.'))
-		.catch((error) -> context.send(error.message))
+		.then(-> context.send(context.random(confirmations)))
+		.catch(createErrorReporter(context))
 
 	###*
 	* Bookmark a url for this room
@@ -129,5 +115,5 @@ module.exports = (robot) ->
 	###
 	robot.respond /bookmark\s(\S+)$/i, (context) ->
 		bookmark(context.envelope.room, context.match[1])
-		.then(-> context.send('Done.'))
-		.catch((error) -> context.send(error.message))
+		.then(-> context.send(context.random(confirmations)))
+		.catch(createErrorReporter(context))
