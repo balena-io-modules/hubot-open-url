@@ -107,10 +107,12 @@ module.exports = (robot) ->
 				]
 				context.send(response.join(' '))
 			)
-			.catch((error) -> context.send(error.message))
+			.catch (error) ->
+				robot.logger.error(error)
+				context.send('Something went wrong')
 		catch error
 			robot.logger.error(error)
-			context.send("Something went wrong.")
+			context.send('Something went wrong.')
 
 	###*
 	* Bookmark a url for the given word
