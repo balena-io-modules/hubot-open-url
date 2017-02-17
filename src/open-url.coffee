@@ -100,8 +100,7 @@ module.exports = (robot) ->
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
 		context.send(personality.buildMessage('holding', 'greeting'))
 		try
-			bookmark = getBookmarkFromContext(context)
-			get(bookmark)
+			get(getBookmarkFromContext(context))
 			.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
 			.catch(createErrorReporter(context))
 		catch error
