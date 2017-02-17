@@ -101,11 +101,11 @@ module.exports = (robot) ->
 		context.send(personality.buildMessage('holding', 'greeting'))
 		try
 			bookmark = getBookmarkFromContext(context)
+			get(bookmark)
+			.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
+			.catch(createErrorReporter(context))
 		catch error
 			createErrorReporter(context)(error)
-		get(bookmark)
-		.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
-		.catch(createErrorReporter(context))
 
 	###*
 	* Bookmark a url for the given word
