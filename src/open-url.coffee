@@ -4,8 +4,8 @@
 # Commands:
 #   hubot open - Open the bookmark named after the room
 #   hubot open named - Open the bookmark named
-#   hubot <url> - Bookmark for this room
-#   hubot <url> name - Bookmark for particular name
+#   hubot bookmark <url> - Bookmark for this room
+#   hubot bookmark <url> name - Bookmark for particular name
 #
 # Author:
 #   josephroberts, okakosolikos, sqweelygig
@@ -14,35 +14,11 @@ firebaseUrl = process.env.HUBOT_FIREBASE_URL
 firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
-confirmations = [
-	'Door unlocked.'
-	"You're on the list."
-	'Come on in.'
-	'psssh...tsch'
-	"What can I say, except 'you're welcome'!"
-]
-salutations = [
-	'Hey there!'
-	'Howdy!'
-	"G'day mate!"
-	'Hiya!'
-	'Hi!'
-	'Hello!'
-]
-greetings = [
-	'Nice to see you!'
-	'What’s up man?'
-	'Sup bro?'
-	'Loving those shoes!'
-	'Grab a coffee.'
-]
-holdings = [
-	'Working on it.'
-	'Doing that now.'
-	'Gimme a moment.'
-]
+
+Personality = require('./personality.coffee')
 
 module.exports = (robot) ->
+	personality = new Personality(process.env.HUBOT_PERSONALITY)
 	robot.http("#{firebaseUrl}/data/bookmarks.json?auth=#{firebaseAuth}")
 		.get() (err, res, body) ->
 			if err? or res.statusCode isnt 200
@@ -51,22 +27,23 @@ module.exports = (robot) ->
 				bookmarks = JSON.parse body
 
 	###*
-	* This creates a function to shim the http response
-	* @param {function} post successes to
-	* @param {function} post failures to
-	* @return {function} Takes (err, res, body) and passes them to (resolve, reject)
+	* Creates a function that converts a Hubot HTTP response into a Promise resolution
+	* @param {function} resolve - a function for successful http requests
+	* @param {function} reject - a function for http errors
+	* @return {function} - a function that converts Hubot http responses
+	* (err, res, body) and renders them to a Promise function (resolve, reject)
 	###
 	createResolver = (resolve, reject) ->
 		(err, res, body) ->
 			if (not err?) and (res.statusCode is 200)
 				resolve(body)
 			else
-				reject(err ? new Error("StatusCode: #{res.statusCode}"))
+				reject(err ? new Error("StatusCode: #{res.statusCode}; Body: #{body}"))
 
 	###*
-	* This creates a function to report errors
-	* @param {Object} Hubot msg object
-	* @return {function} Takes (Error) and reports it
+	* Creates a function that communicates an error.
+	* @param {Object} context - A Hubot msg object
+	* @return {function} - a function that takes (error) and communicates it
 	###
 	createErrorReporter = (context) ->
 		(error) ->
@@ -74,67 +51,76 @@ module.exports = (robot) ->
 			context.send('Something went wrong. Debug output logged')
 
 	###*
-	* Attempt to visit the url referenced by key
-	* @param {string} url to visit
-	* @return {Promise} Handle output from the asynchronous
+	* Attempt to get the url referenced in a Promise resolution rather than (err, res, body)
+	* @param {string} url - address of the web site to get
+	* @return {Promise} - A promise for the response for the given url
 	###
-	open = (url) ->
+	get = (url) ->
 		new Promise (resolve, reject) ->
 			robot.http(url).get() createResolver(resolve, reject)
 
 	###*
 	* Store a url in the cache and firebase
-	* @param {string} key under which to store it
-	* @param {string} bookmark to store
-	* @return {Promise} Handle output from the asynchronous section
+	* @param {string} namespace - a namespace under which to store the value
+	* @param {string} key - a name for the value
+	* @param {string} value - url to store
+	* @return {Promise} - A promise for the response from storing the given pair
 	###
-	bookmark = (key, value) ->
+	bookmark = (namespace, key, value) ->
 		new Promise (resolve, reject) ->
-			bookmarks[key] = value
+			bookmarks[namespace] ?= {}
+			bookmarks[namespace][key] = value
 			robot.http("#{firebaseUrl}/data/.json?auth=#{firebaseAuth}")
 				.patch(JSON.stringify({ bookmarks: bookmarks })) createResolver(resolve, reject)
 
 	###*
-	* Extract a value from the context provided
-	* @param {Object} Hubot msg object
-	* @return {string} Value from the stored bookmarks
+	* Extract a value from the context provided.
+	* Attempts to use first match then room name.
+	* @param {Object} context - A Hubot msg object
+	* @return {string} - Value from the stored bookmarks
 	###
-	getValueFromContext = (context) ->
-		if bookmarks[context.match[1]]?
-			return bookmarks[context.match[1]]
-		else if bookmarks[context.envelope.room]?
-			return bookmarks[context.envelope.room]
+	getBookmarkFromContext = ({ match: [_, bookmarkName], envelope: { room: roomName } }) ->
+		if bookmarkName?
+			scope = 'named'
+			key = bookmarkName
+		else if roomName?
+			scope = 'rooms'
+			key = roomName
 		else
-			throw new Error("Couldn't find key.")
+			throw new Error('No key specified.')
+		if bookmarks[scope]?[key]?
+			return bookmarks[scope][key]
+		else
+			throw new Error('Unknown key.')
 
 	###*
 	* Attempt to open the specified bookmark, defaulting to a bookmark for the room
-	* (?:\W(\w+))? match up to the first word after open, capturing just the word
 	###
+	# (?:\W(\w+))? match up to the first word after open, capturing just the word
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
-		context.send(context.random(salutations) + ' ' + context.random(holdings))
+		context.send(personality.buildMessage('holding', 'greeting'))
 		try
-			open(getValueFromContext(context))
-			.then(-> context.send(context.random(confirmations) + ' ' + context.random(greetings)))
+			get(getBookmarkFromContext(context))
+			.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
 			.catch(createErrorReporter(context))
 		catch error
 			createErrorReporter(context)(error)
 
 	###*
 	* Bookmark a url for the given word
-	* bookmark, followed by whitespace, followed by non-whitespace (url) ...
-	* followed by whitespace, followed by word (key), followed by end of string
 	###
+	# bookmark, followed by whitespace, followed by non-whitespace (url) ...
+	# followed by whitespace, followed by word (key), followed by end of string
 	robot.respond /bookmark\s(\S+)\s(\w+)$/i, (context) ->
-		bookmark(context.match[2], context.match[1])
-		.then(-> context.send('Done.'))
+		bookmark('named', context.match[2], context.match[1])
+		.then(-> context.send(personality.buildMessage('configured')))
 		.catch(createErrorReporter(context))
 
 	###*
 	* Bookmark a url for this room
-	* bookmark, followed by whitespace, followed by non-whitespace (url), followed by end of string
 	###
+	# bookmark, followed by whitespace, followed by non-whitespace (url), followed by end of string
 	robot.respond /bookmark\s(\S+)$/i, (context) ->
-		bookmark(context.envelope.room, context.match[1])
-		.then(-> context.send('Done.'))
+		bookmark('rooms', context.envelope.room, context.match[1])
+		.then(-> context.send(personality.buildMessage('configured')))
 		.catch(createErrorReporter(context))
