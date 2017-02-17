@@ -11,19 +11,19 @@ class Personality
 		personalities =
 			rude:
 				confirm: ['Done it.']
-				holding: ["Shut up and wait, I'll do it"]
+				holding: ['Shut up and wait, I\'ll do it']
 				departure: ['You can go away now.']
-				deny: ["Sod off, I'm not doing that"]
+				deny: ['Sod off, I\'m not doing that']
 			marvin:
-				greeting: ["Lousy day isn't it?"]
+				greeting: ['Lousy day isn\'t it?']
 				confirm: ['Another menial task complete.']
-				holding: ["A brain the size of a planet, and this is what I'm doing"]
+				holding: ['A brain the size of a planet, and this is what I\'m doing']
 				pleasantry: [ # irony
 					'Did I tell you about the pain in all the diodes down my left side.'
-					"I don't expect you to care about me."
-					"It's a lonely life."
+					'I don\'t expect you to care about me.'
+					'It\'s a lonely life.'
 				]
-				deny: ["I could do that easily, but I'm not allowed"]
+				deny: ['I could do that easily, but I\'m not allowed']
 			gpp: # Genuine People Personality
 				greeting: [
 					'Hey there!'
@@ -46,7 +46,7 @@ class Personality
 				]
 				confirm: [
 					'Door unlocked.'
-					"You're on the list."
+					'You\'re on the list.'
 					'Come on in.'
 					'psssh...tsch.'
 				]
@@ -64,7 +64,7 @@ class Personality
 		@phrases =
 			confirm: ['Done.']
 			holding: ['Doing.']
-			deny: ["Can't do"]
+			deny: ['Can\'t do.']
 		for purpose, bank of personalities[personality] ? {}
 			@phrases[purpose] = bank
 
