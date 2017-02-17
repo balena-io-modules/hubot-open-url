@@ -14,14 +14,12 @@ firebaseUrl = process.env.HUBOT_FIREBASE_URL
 firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
-confirmations = [
-	'Done.'
-]
-holdings = [
-	'Doing'
-]
+
+Promise = require 'bluebird'
+Personality = require './personality.coffee'
 
 module.exports = (robot) ->
+	personality = new Personality(process.env.HUBOT_PERSONALITY)
 	robot.http("#{firebaseUrl}/data/bookmarks.json?auth=#{firebaseAuth}")
 		.get() (err, res, body) ->
 			if err? or res.statusCode isnt 200
@@ -101,10 +99,9 @@ module.exports = (robot) ->
 	###
 	# (?:\W(\w+))? match up to the first word after open, capturing just the word
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
-		context.send(context.random(holdings))
-		Promise.try ->
-			get(getBookmarkFromContext(context))
-		.then(-> context.send(context.random(confirmations)))
+		context.send(personality.buildMessage('holding', 'greeting'))
+		Promise.try(get(getBookmarkFromContext(context)))
+		.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
 		.catch(createErrorReporter(context))
 
 	###*
@@ -114,7 +111,7 @@ module.exports = (robot) ->
 	# followed by whitespace, followed by word (key), followed by end of string
 	robot.respond /bookmark\s(\S+)\s(\w+)$/i, (context) ->
 		bookmark('named', context.match[2], context.match[1])
-		.then(-> context.send(context.random(confirmations)))
+		.then(-> context.send(personality.buildMessage('configured')))
 		.catch(createErrorReporter(context))
 
 	###*
@@ -123,5 +120,5 @@ module.exports = (robot) ->
 	# bookmark, followed by whitespace, followed by non-whitespace (url), followed by end of string
 	robot.respond /bookmark\s(\S+)$/i, (context) ->
 		bookmark('rooms', context.envelope.room, context.match[1])
-		.then(-> context.send(context.random(confirmations)))
+		.then(-> context.send(personality.buildMessage('configured')))
 		.catch(createErrorReporter(context))
