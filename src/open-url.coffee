@@ -15,8 +15,8 @@ firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
 
-Personality = require('./personality.coffee')
 Promise = require 'bluebird'
+Personality = require './personality.coffee'
 
 module.exports = (robot) ->
 	personality = new Personality(process.env.HUBOT_PERSONALITY)
