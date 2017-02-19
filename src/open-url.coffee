@@ -49,7 +49,7 @@ module.exports = (robot) ->
 	createErrorReporter = (context) ->
 		(error) ->
 			robot.logger.error(error)
-			context.send('Something went wrong. Debug output logged')
+			context.send("Something went wrong. #{error.message}")
 
 	###*
 	* Attempt to get the url referenced in a Promise resolution rather than (err, res, body)
