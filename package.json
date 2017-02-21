@@ -1,6 +1,6 @@
 {
   "name": "hubot-open-url",
-  "version": "0.2.0",
+  "version": "0.1.2",
   "description": "A simple hubot script that opens a url",
   "main": "loader.coffee",
   "scripts": {
