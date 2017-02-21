@@ -49,7 +49,7 @@ module.exports = (robot) ->
 	createErrorReporter = (context) ->
 		(error) ->
 			robot.logger.error(error)
-			context.send('Something went wrong. Debug output logged')
+			context.send("Something went wrong. #{error.message}")
 
 	###*
 	* Attempt to get the url referenced in a Promise resolution rather than (err, res, body)
@@ -100,7 +100,7 @@ module.exports = (robot) ->
 	# (?:\W(\w+))? match up to the first word after open, capturing just the word
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
 		context.send(personality.buildMessage('holding', 'greeting'))
-		Promise.try(get(getBookmarkFromContext(context)))
+		Promise.try(-> get(getBookmarkFromContext(context)))
 		.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
 		.catch(createErrorReporter(context))
 
