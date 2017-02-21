@@ -100,7 +100,7 @@ module.exports = (robot) ->
 	# (?:\W(\w+))? match up to the first word after open, capturing just the word
 	robot.respond /open(?:\W(\w+))?/i, (context) ->
 		context.send(personality.buildMessage('holding', 'greeting'))
-		Promise.try(get(getBookmarkFromContext(context)))
+		Promise.try(-> get(getBookmarkFromContext(context)))
 		.then(-> context.send(personality.buildMessage('confirm', 'pleasantry')))
 		.catch(createErrorReporter(context))
 
