@@ -15,8 +15,8 @@ firebaseAuth = process.env.HUBOT_FIREBASE_SECRET
 
 bookmarks = {}
 
-Personality = require('./personality.coffee')
 Promise = require 'bluebird'
+Personality = require './personality.coffee'
 
 module.exports = (robot) ->
 	personality = new Personality(process.env.HUBOT_PERSONALITY)
@@ -49,7 +49,7 @@ module.exports = (robot) ->
 	createErrorReporter = (context) ->
 		(error) ->
 			robot.logger.error(error)
-			context.send('Something went wrong. Debug output logged')
+			context.send("Something went wrong. #{error.message}")
 
 	###*
 	* Attempt to get the url referenced in a Promise resolution rather than (err, res, body)
